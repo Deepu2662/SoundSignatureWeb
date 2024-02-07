@@ -382,7 +382,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("images/background_image.jpg"), // Set your background image
+            image: AssetImage("images/background_image.jpeg"), // Set your background image
             fit: BoxFit.cover,
           ),
         ),
