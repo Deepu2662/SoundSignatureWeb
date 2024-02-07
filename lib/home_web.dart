@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:audio_2fa/user_page.dart';
@@ -30,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> convertAndUploadBlobToAudio(String blobUrl) async {
     // Step 1: Fetch Blob data
     html.HttpRequest request =
-    await html.HttpRequest.request(blobUrl, responseType: 'blob');
+        await html.HttpRequest.request(blobUrl, responseType: 'blob');
     html.Blob blob = request.response;
 
     // Step 2: Convert Blob data to audio file format (if needed)
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> {
           url, {'audio': base64.encode(audioData), 'type': "web", "aid": aid},
           requestHeaders: {"Authorization": "token $token"});
       print('Upload successful: ${request.responseText}');
-      st = Timer.periodic(Duration(seconds: 3), (timer) {
+      st = Timer.periodic(const Duration(seconds: 3), (timer) {
         verify();
       });
     } catch (e) {
@@ -78,7 +77,7 @@ class _HomePageState extends State<HomePage> {
 
 ////////////////////////////////
 
-  showToast(String msg){
+  showToast(String msg) {
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,
@@ -86,31 +85,28 @@ class _HomePageState extends State<HomePage> {
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
-  bool _isVerifying=false;
-  bool _verified=false;
-  String error_msg="";
+
+  bool _isVerifying = false;
+  bool _verified = false;
+  String error_msg = "";
   verify() async {
     try {
-
       String data1 = """{"message":"web-verify-process"}""";
       channel.sink.add(data1);
       setState(() {
-        _isRecording=false;
-        _isVerifying=true;
+        _isRecording = false;
+        _isVerifying = true;
       });
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       token = prefs.getString('token')!;
       http.Response resp = await http.post(Uri.parse(verify_url),
-          body: {"aid":aid},
-          headers: {"Authorization": "token $token"});
+          body: {"aid": aid}, headers: {"Authorization": "token $token"});
       print(resp.body);
       if (resp.statusCode == 200) {
-
-        Map<String,dynamic> data=jsonDecode(resp.body);
-        if(data['match']) {
+        Map<String, dynamic> data = jsonDecode(resp.body);
+        if (data['match']) {
           String data1 = """{"message":"web-verify-success"}""";
           channel.sink.add(data1);
           print("Verification success");
@@ -123,48 +119,41 @@ class _HomePageState extends State<HomePage> {
 
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => UserMain()));
-        }
-        else{
+        } else {
           st.cancel();
 
           String data1 = """{"message":"web-verify-fail"}""";
           channel.sink.add(data1);
 
           setState(() {
-            _isVerifying=false;
-            _verified=false;
-
+            _isVerifying = false;
+            _verified = false;
           });
           showToast("Verification failed");
         }
-      }
-      else if(resp.statusCode==412){
+      } else if (resp.statusCode == 412) {
         print("processing");
-      }
-      else {
+      } else {
         st.cancel();
 
         String data1 = """{"message":"web-verify-fail"}""";
         channel.sink.add(data1);
 
         setState(() {
-          _isVerifying=false;
-          _verified=false;
-          error_msg="Unable to verify";
+          _isVerifying = false;
+          _verified = false;
+          error_msg = "Unable to verify";
         });
         showToast("Verification failed");
-
       }
     } catch (e) {
-
       String data1 = """{"message":"web-verify-fail"}""";
       channel.sink.add(data1);
 
       setState(() {
-        _isVerifying=false;
-        _verified=false;
-        error_msg="Unable to verify";
-
+        _isVerifying = false;
+        _verified = false;
+        error_msg = "Unable to verify";
       });
       showToast("Verification failed");
 
@@ -178,7 +167,6 @@ class _HomePageState extends State<HomePage> {
   String token = "";
   String aid = "";
   Future<void> wsconnect() async {
-
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token')!;
     channel = WebSocketChannel.connect(
@@ -187,29 +175,10 @@ class _HomePageState extends State<HomePage> {
 
     /// Listen for all incoming data
     channel.stream.listen(
-          (data) {
+      (data) {
         print("data is $data");
         Map<dynamic, dynamic> data1 = jsonDecode((data.toString()));
         String msg = data1['message'];
-        // if (msg.contains("web")) {
-        //   setState(() {
-        //     wsweb = "Online";
-        //   });
-        //   if (msg.contains("rec")) {
-        //     _start();
-        //     Future.delayed(Duration(seconds: 5), () {
-        //       _stop();
-        //     });
-        //   }
-        //   if (msg.contains("aid")) {
-        //     aid = msg.substring(msg.length - 5);
-        //     print("aid: $aid");
-        //   }
-        // } else {
-        //   setState(() {
-        //     wsweb = "Offline";
-        //   });
-        // }
       },
       onError: (error) {
         print("error is $error");
@@ -228,7 +197,6 @@ class _HomePageState extends State<HomePage> {
     wsconnect();
     _isRecording = false;
   }
-
 
   getPerm() async {
     await _audioRecorder.hasPermission();
@@ -265,53 +233,15 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _stop() async {
     setState(() {
-      _isRecording=false;
-      _isVerifying=true;
+      _isRecording = false;
+      _isVerifying = true;
     });
     try {
       final String? path = await _audioRecorder.stop();
-
       print(path);
-
       if (true) {
         final blobFilePath = path;
         convertAndUploadBlobToAudio(blobFilePath!);
-        // if (blobFilePath != null) {
-        //   // Set API endpoint URL
-        //   Uri uri1 = Uri.parse(upload_url);
-        //
-        //   // Create multipart request
-        //   var request1 = http.MultipartRequest('POST', uri1);
-        //
-        //   // var bytesData = bd.
-        //
-        //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-        //   token = prefs.getString('token')!;
-        //   // request1.headers.addAll({"Authorization": "token $token"});
-        //   // if (Platform.isAndroid) {
-        //   //   request1.fields.addAll({"aid": aid, "type": "mob"});
-        //   //
-        //   //   request1.files
-        //   //       .add(await http.MultipartFile.fromPath('audio', blobFilePath));
-        //   // } else {
-        //   //   request1.fields.addAll({"aid": aid, "type": "web"});
-        //   //
-        //   //   final uri = Uri.parse(blobFilePath);
-        //   //   final client = http.Client();
-        //   //   final request = await client.get(uri);
-        //   //   print(request.headers);
-        //   //   final bytes = await request.bodyBytes;
-        //   //   print('response bytes.length: ${bytes.length}');
-        //   //   request1.files.add(http.MultipartFile.fromBytes(
-        //   //     "audio",
-        //   //     bytes,
-        //   //     filename: "audio.m4a",
-        //   //   ));
-        //   // // }
-        //   // // Send request
-        //   // var response = await request1.send();
-        //   setState(() => _isRecording = false);
-        // }
       }
     } catch (e) {
       print(e);
@@ -351,10 +281,10 @@ class _HomePageState extends State<HomePage> {
 
     _ampTimer =
         Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-          _amplitude = await _audioRecorder.getAmplitude();
-          print("Amplitude: ${_amplitude!.current}");
-          setState(() {});
-        });
+      _amplitude = await _audioRecorder.getAmplitude();
+      print("Amplitude: ${_amplitude!.current}");
+      setState(() {});
+    });
   }
 
   Future<void> _pause() async {
@@ -367,7 +297,7 @@ class _HomePageState extends State<HomePage> {
 
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  Random _rnd = Random();
+  final Random _rnd = Random();
 
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
@@ -375,14 +305,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Verification"),
-        backgroundColor: Colors.blue, // Customize the app bar color
-      ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("images/background_image.jpg"), // Set your background image
+            image: AssetImage(
+                "images/background_image.jpeg"), // Set your background image
             fit: BoxFit.cover,
           ),
         ),
@@ -390,46 +317,53 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _isRecording?Column(
-              children: [
-                Container(
-                  child: SpinKitWave(color: Colors.blue,),
-                ),
-                Text("Processing..",style: TextStyle(fontSize: 15),),
-              ],
-            ):Container(),
-
-            _isVerifying?Column(
-              children: [
-                Container(
-                  child: SpinKitFadingCircle(color: Colors.blue,),
-                ),
-                Text("Verifying..",style: TextStyle(fontSize: 15),),
-              ],
-            ):Container(),
+            _isRecording
+                ? const Column(
+                    children: [
+                      SpinKitWave(
+                        color: Colors.blue,
+                      ),
+                      Text(
+                        "Processing..",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  )
+                : Container(),
+            _isVerifying
+                ? const Column(
+                    children: [
+                      SpinKitFadingCircle(
+                        color: Colors.blue,
+                      ),
+                      Text(
+                        "Verifying..",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  )
+                : Container(),
+            Text(error_msg),
             Container(
-              child: Text("$error_msg"),
-            ),
-            Container(
-              margin: EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
               child: ElevatedButton(
                   onPressed: () async {
                     aid = getRandomString(5);
 
                     String data = """{"message":"web-aid-$aid"}""";
                     channel.sink.add(data);
-                    await Future.delayed(Duration(seconds: 1));
+                    await Future.delayed(const Duration(seconds: 1));
                     String data1 = """{"message":"web-rec"}""";
                     channel.sink.add(data1);
 
                     _start();
-                    await Future.delayed(Duration(seconds: 30), () {
+                    await Future.delayed(const Duration(seconds: 30), () {
                       String data1 = """{"message":"web-stop"}""";
                       channel.sink.add(data1);
                       _stop();
                     });
                   },
-                  child: Text("Start Verification")),
+                  child: const Text("Start Verification")),
             )
           ],
         ),
