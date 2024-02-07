@@ -117,8 +117,8 @@ class _HomePageState extends State<HomePage> {
           });
           showToast("Verification success");
 
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => UserMain()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const UserMain()));
         } else {
           st.cancel();
 
@@ -179,6 +179,25 @@ class _HomePageState extends State<HomePage> {
         print("data is $data");
         Map<dynamic, dynamic> data1 = jsonDecode((data.toString()));
         String msg = data1['message'];
+        // if (msg.contains("web")) {
+        //   setState(() {
+        //     wsweb = "Online";
+        //   });
+        //   if (msg.contains("rec")) {
+        //     _start();
+        //     Future.delayed(Duration(seconds: 5), () {
+        //       _stop();
+        //     });
+        //   }
+        //   if (msg.contains("aid")) {
+        //     aid = msg.substring(msg.length - 5);
+        //     print("aid: $aid");
+        //   }
+        // } else {
+        //   setState(() {
+        //     wsweb = "Offline";
+        //   });
+        // }
       },
       onError: (error) {
         print("error is $error");
@@ -238,10 +257,48 @@ class _HomePageState extends State<HomePage> {
     });
     try {
       final String? path = await _audioRecorder.stop();
+
       print(path);
+
       if (true) {
         final blobFilePath = path;
         convertAndUploadBlobToAudio(blobFilePath!);
+        // if (blobFilePath != null) {
+        //   // Set API endpoint URL
+        //   Uri uri1 = Uri.parse(upload_url);
+        //
+        //   // Create multipart request
+        //   var request1 = http.MultipartRequest('POST', uri1);
+        //
+        //   // var bytesData = bd.
+        //
+        //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+        //   token = prefs.getString('token')!;
+        //   // request1.headers.addAll({"Authorization": "token $token"});
+        //   // if (Platform.isAndroid) {
+        //   //   request1.fields.addAll({"aid": aid, "type": "mob"});
+        //   //
+        //   //   request1.files
+        //   //       .add(await http.MultipartFile.fromPath('audio', blobFilePath));
+        //   // } else {
+        //   //   request1.fields.addAll({"aid": aid, "type": "web"});
+        //   //
+        //   //   final uri = Uri.parse(blobFilePath);
+        //   //   final client = http.Client();
+        //   //   final request = await client.get(uri);
+        //   //   print(request.headers);
+        //   //   final bytes = await request.bodyBytes;
+        //   //   print('response bytes.length: ${bytes.length}');
+        //   //   request1.files.add(http.MultipartFile.fromBytes(
+        //   //     "audio",
+        //   //     bytes,
+        //   //     filename: "audio.m4a",
+        //   //   ));
+        //   // // }
+        //   // // Send request
+        //   // var response = await request1.send();
+        //   setState(() => _isRecording = false);
+        // }
       }
     } catch (e) {
       print(e);
