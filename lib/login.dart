@@ -35,7 +35,7 @@ class _LoginDemoState extends State<LoginDemo> {
         "password": password,
       };
       http.Response response =
-          await http.post(Uri.parse(login_url), body: body);
+      await http.post(Uri.parse(login_url), body: body);
       print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -70,53 +70,68 @@ class _LoginDemoState extends State<LoginDemo> {
               ),
             ),
           ),
-          // Semi-Transparent Overlay
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
-            ),
-          ),
           SingleChildScrollView(
             child: Column(
               children: <Widget>[
                 const SizedBox(height: 30),
                 const Text(
                   "Login",
-                  style: TextStyle(fontSize: 32, color: Colors.black),
+                  style: TextStyle(
+                      fontSize: 32, color: Color.fromARGB(255, 0, 0, 0)),
                 ),
-                Padding(
-                  padding:
+                Center(
+                  child: SizedBox(
+                    width: 400,
+                    child: Padding(
+                      padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: TextField(
-                    style: const TextStyle(color: Colors.black),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                      hintText: 'Enter valid email id',
-                      labelStyle: TextStyle(color: Colors.black),
-                      hintStyle: TextStyle(color: Colors.black),
+                      child: TextField(
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0)),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                          hintText: 'Enter valid email id',
+                          labelStyle:
+                          TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          hintStyle:
+                          TextStyle(color: Color.fromARGB(179, 0, 0, 0)),
+                          fillColor: Colors.white,
+                          filled: true,
+                        ),
+                        onChanged: (e) {
+                          email = e;
+                        },
+                      ),
                     ),
-                    onChanged: (e) {
-                      email = e;
-                    },
                   ),
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: TextField(
-                    style: const TextStyle(color: Colors.black),
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                      hintText: 'Enter secure password',
-                      labelStyle: TextStyle(color: Colors.black),
-                      hintStyle: TextStyle(color: Colors.black),
+                Center(
+                  child: SizedBox(
+                    width: 400,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      child: TextField(
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0)),
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                          hintText: 'Enter secure password',
+                          labelStyle:
+                          TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          hintStyle:
+                          TextStyle(color: Color.fromARGB(179, 0, 0, 0)),
+                          fillColor: Colors.white,
+                          filled: true,
+                        ),
+                        onChanged: (e) {
+                          password = e;
+                        },
+                      ),
                     ),
-                    onChanged: (e) {
-                      password = e;
-                    },
                   ),
                 ),
                 InkWell(
